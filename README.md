@@ -41,10 +41,10 @@ If the decision is to isolate the host, LimaCharlie will be instructed to isolat
 ## Step-by-Step Walkthrough
 
 - - - 
-## Detection & Response Scenario
-
-- - - 
 ## Key Skills Demonstrated
 
 - - - 
-## Reflection
+## Summary
+This project demonstrates how to utilize LimaCharlie as an EDR platform in conjunction with Tine's flexible playbooks to detect malware and automate notifications to security teams. This automated workflow reduces the response time, minimzes human error, and strengthens the overall security posture. Beyond the technical proof-of-concept, this lab demonstrates the real-world value of utilizing SOARs and EDR platforms. They free analysts from repetitive tasks so they can focus on more important tasks.
+
+
