@@ -1,1 +1,1 @@
-# -WIP-Endpoint-Detection-Automated-Response-EDR-SOAR-Security-Workflow
+# (WIP) Automated SOC Workflow: Tines SOAR Integrated with LimaCharlie EDR
