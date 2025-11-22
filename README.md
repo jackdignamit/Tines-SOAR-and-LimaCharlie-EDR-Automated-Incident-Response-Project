@@ -13,6 +13,8 @@ This is a hands-on lab environment which utilizes **Tines** as a *security orche
 A malicious program (LaZagne.exe) runs on a hosted virtual machine, which will flag **LimaCharlie** to detect it and send it to our SOAR. 
 Then, our **SOAR (Tines)** triggers automated actions such as alerting Slack channels, sending emails containing analytics, and a website to optionally isolate the infected machine from the network.
 
+<img width="990" height="1063" alt="Screenshot 2025-11-08 143039" src="https://github.com/user-attachments/assets/2870de3a-b02e-40d6-841d-dc285ca35b26" />
+
 ## Objectives
 1. **Detect malicious behavior:**  
    Use LimaCharlie to detect when LaZagne.exe executes on a Windows VM by using a Detect & Response Rule. 
@@ -78,10 +80,10 @@ LaZagne is an open-source application that is used to retrieve passwords stored 
 It is a form of malware, but since we are using a VM with nothing personable on it, it will just be used to flag our detection rule on LimaCharlie.
 - **Review Source Code / Download here: [https://github.com/AlessandroZ/LaZagne](https://github.com/AlessandroZ/LaZagne)**
   
-1. If you attempt to install LaZagne, it will be blocked by Windows Security. **Disable Windows Security** by turning off **real-time protection** under **Virus & Threat Protection** settings.
+1. If you attempt to install LaZagne, it will be blocked by Windows Security. **Disable Windows Security** by turning off **real-time protection** under **Virus & Threat Protection** settings on YOUR VM.
    
 2. Install LaZagne from the link listed above. If prompted to keep the file, select "keep anyway".
-- *If it still fails to download, you can add exclusions for the Downloads folder or your entire drive if need be.*
+- *If it still fails to download, you can add exclusions for the Downloads folder or your entire drive if need be on Windows Defender.*
    
 3. In the downloads folder, shift and right click to open an administrator PowerShell window in your directory.
    
@@ -94,18 +96,93 @@ It is a form of malware, but since we are using a VM with nothing personable on 
 - - - 
 
 ## 4️⃣ Create Detection & Response Rule for LaZagne.exe
+In LimaCharlie, we want to create a **detection and response rule** to **automate the process of identifying threats and taking immediate action to mitigate them**. This rule will also be utilized for our webhooks in our Tine's SOAR later on.
+
+1. To create a D&R rule, open the main dashboard for LimaCharlie and select the **automation tab**. Then click **D&R rules**.
+
+2. Click on the "new rule" button in the top right corner. Under your new rule, you can either create your own LaZagne detection rule from scratch or utilize a template of a previously existing rule and adjust the values.
+But for convenience, I will list my rule for copy and pasting:
+
+<img width="691" height="769" alt="Screenshot 2025-11-08 123127" src="https://github.com/user-attachments/assets/7629a606-f5e6-4f37-b9af-452a3747e203" />
+
+```
+events:
+  - NEW_PROCESS
+  - EXISTING_PROCESS
+op: and
+rules:
+  - op: is windows
+  - op: or
+    rules:
+    - case sensitive: false
+      op: ends with
+      path: event/FILE_PATH
+      value: LaZagne.exe
+    - case sensitive: false
+      op: contains
+      path: event/COMMAND_LINE
+      value: LaZagne
+    - case sensitive: false
+      op: is
+      path: event/HASH
+      value: '3cc5ee93a9ba1fc57389705283b760c8bd61f35e9398bbfa3210e2becf6d4b05'
+    - case sensitive: false
+      op: ends with
+      path: event/COMMAND_LINE
+      value: all
+
+- action: report
+  metadata:
+    author: Jack Dignam
+    description: Detects Lazagne Usage (SOAR-EDR Tool)
+    falsepositives:
+    - ToTheMoon
+    level: high
+    tags:
+    - attack.credential_access
+  name: JD - HackTool - Lazagne
+```
+You can press "test event" at the bottom of the page to see if the D&R rule is functioning properly.
+
+### **A quick summary of what this rule does:**  
+This rule detects LaZagne and identifies its process name, command-line arguments, binary hash, LaZagne keywords (such as all), catches existing and new processes, and limits to only Windows events. It is not case sensitive and will detect anything containing the characters 'lazagne.exe' regardless of capitalization.
+
+<img width="2452" height="517" alt="Screenshot 2025-11-08 123509" src="https://github.com/user-attachments/assets/eb8fa090-1795-41c2-91ea-921dcf842708" />
+
+Now if you rerun LaZagne on your virtual machine, the LimaCharlie sensor will detect it and filter it using the newly-created D&R rule. You can view the detection under the detections tab on the main LimaCharlie dashboard.
 
 - - - 
 
-## 5️⃣ Setup Slack in Tines (SOAR)
+## 5️⃣ Establish a link between Tines and LimaCharlie
+Tines allows teams to easily build, automate, and orchestrate security processes without heavy coding. It utilizes event-driven "stories" to connect tools and websites to make enriched alerts and decisions using user-friendly interfaces.
+1. To start, create a [Tines](https://tines.com) account.
+   
+2. In Tines, lets establish a link between Tines and LimaCharlie to funnel alerts into our workflow. Drag a webhook from the left-hand side to the center of the screen.
+<img width="468" height="192" alt="image" src="https://github.com/user-attachments/assets/34264e8b-e59b-4ea6-9778-3339c6af45d3" />
+
+3. In the webhook settings, **copy the webhook URL** and navigate back to LimaCharlie. In the LimaCharlie dashboard, under the outputs tab, add a new ***detection*** output. Select Tines and paste in the webhook URL under "destination host".
+   - Regenerate your event in your VM if no samples are listed  
+
+4. If you've set up the link between Tines and LimaCharlie properly, you should be seeing the newly created events in the Tines webhook.
+<img width="1552" height="552" alt="image" src="https://github.com/user-attachments/assets/2ae69499-ab87-4ae5-aabf-479c3ff4c27d" />
+<img width="842" height="511" alt="Screenshot 2025-11-08 124543" src="https://github.com/user-attachments/assets/305c3fed-e980-45e8-9dd7-43cbb71d3c92" />
 
 - - - 
 
-## 6️⃣ Add Emails to Tines workflow
+## 6️⃣ Setup Slack in Tines
+In SOAR workflows, Slack is often used as a fast, centralized communication channel for security analysts to recieve alerts, collaborate, and trigger automated actions without leaving the chat environment. Let's set it up for our detection workflow!
+1. To start, create a [Slack](https://slack.com) account.
+
+2. In Slack, create a new workspace and an "alerts" channel. We will setup Tines to utilize this channel for security alerts.
+<img width="423" height="586" alt="image" src="https://github.com/user-attachments/assets/34c3f68b-0aed-42c6-b369-3e4e2e5a82a6" />
 
 - - - 
 
-## 7️⃣ Setup Isolation Response webpage in Tines
+## 7️⃣ Add Emails to Tines Workflow
+
+- - - 
+
+## 8️⃣ Setup Isolation Response webpage in Tines
 
 - - - 
 
