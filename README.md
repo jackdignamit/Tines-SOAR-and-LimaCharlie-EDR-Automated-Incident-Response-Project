@@ -15,18 +15,6 @@ Then, our **SOAR (Tines)** triggers automated actions such as alerting Slack cha
 
 <img width="990" height="1063" alt="Screenshot 2025-11-08 143039" src="https://github.com/user-attachments/assets/2870de3a-b02e-40d6-841d-dc285ca35b26" />
 
-## Objectives
-1. **Detect malicious behavior:**  
-   Use LimaCharlie to detect when LaZagne.exe executes on a Windows VM by using a Detect & Response Rule. 
-2. **Automate response:**  
-   Once detected, send alert data to a SOAR (Tines) to automate the next steps.  
-3. **Notify stakeholders**  
-   Alert Stakeholders via Slack channels and email.
-4. **Prompt a user using Times**  
-   Prompt a user (such as an analyst) to decide whether to isolate the compromised host using a Time's webpage.
-5. **Isolate the endpoint**  
-If the decision is to isolate the host, LimaCharlie will be instructed to isolate the sensor to prevent further malicious activity. If not, it will remain as whitelisted on the network.
-
 - - - 
 
 # Tools & Technologies Used
@@ -42,6 +30,17 @@ If the decision is to isolate the host, LimaCharlie will be instructed to isolat
 - - - 
 
 # Architecture Diagram
+
+1. **Detect malicious behavior:**  
+   Use LimaCharlie to detect when LaZagne.exe executes on a Windows VM by using a Detect & Response Rule. 
+2. **Automate response:**  
+   Once detected, send alert data to a SOAR (Tines) to automate the next steps.  
+3. **Notify stakeholders**  
+   Alert Stakeholders via Slack channels and email.
+4. **Prompt a user using Times**  
+   Prompt a user (such as an analyst) to decide whether to isolate the compromised host using a Time's webpage.
+5. **Isolate the endpoint**  
+If the decision is to isolate the host, LimaCharlie will be instructed to isolate the sensor to prevent further malicious activity. If not, it will remain as whitelisted on the network.
 
 - - - 
 # 🔢 Step-by-Step Walkthrough 🔢
@@ -181,9 +180,10 @@ In SOAR workflows, Slack is often used as a fast, centralized communication chan
 
 4. On the Tine's storypage, add a Slack template. To sync the template with the alerts channel on Slack, copy the channel's channel ID from there and paste it into the Tine's template.
    
-5. Now that the link is setup, we need to format messages for incoming security incidents including all necessary details. This ensures that security analysts can respond quickly. For my example, I used this HTML formatting:
+5. Now that the link is setup, we need to format messages for incoming security incidents including all necessary details. This ensures that security analysts can respond quickly. For my example, I used this formatting:
 
 <img width="1663" height="373" alt="Screenshot 2025-11-08 132129" src="https://github.com/user-attachments/assets/9312766b-feb4-49d7-a580-308f59a883fc" />
+
 ```
 Title: <<retrieve_detections.body.cat>>
 Time: <<retrieve_detections.body.detect.routing.event_time>>
@@ -209,8 +209,7 @@ Email notifications in a SOAR workflow is essential to keep the right people inf
 
 1. To add email notifications to our Tines SOAR, drag the **"send email"** icon to the storyboard and **connect it to the webhook**.
    
-2. Configure email addresses, sender names, subjects, and the email body using the same formatting from earlier.
-   - In part 8, I setup a webpage that offers to optionally isolate a machine. I also included the link to that in the email so analysts can isolate from anywhere.
+2. Configure email addresses, sender names, subjects, and the email body using HTML formatting.
    
 ```
 Title: <<retrieve_detections.body.cat>>
@@ -224,11 +223,15 @@ Title: <<retrieve_detections.body.cat>>
 <br>
 <br> Detection Link: <<retrieve_detections.body.link>>
 ```
+
 <img width="1667" height="508" alt="Screenshot 2025-11-08 132220" src="https://github.com/user-attachments/assets/fa3fff35-b971-4a5d-bda1-c2ddd9a84a33" />
 
 - - - 
 
 ## 8️⃣ Setup Isolation Response webpage in Tines
+The last section for this project is to create a webpage that offers to isolate the compromised machine.
+
+1. In Tines storyboard, drag a "user prompt" to the storyboard.
 
 - - - 
 
