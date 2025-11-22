@@ -231,7 +231,21 @@ Title: <<retrieve_detections.body.cat>>
 ## 8️⃣ Setup Isolation Response webpage in Tines
 The last section for this project is to create a webpage that offers to isolate the compromised machine.
 
-1. In Tines storyboard, drag a "user prompt" to the storyboard.
+1. In Tines storyboard, drag a "user prompt" to the storyboard and link it to the webhook.
+   
+2. To create the prompt, title the webpage, a description, and use a boolean for the input field so an analyst can state yes or no to isolate a machine.
+   - If you want to include critical details like we did with the Slack alert, just copy and paste the same format into the description section of the webpage.
+   
+<img width="496" height="178" alt="image" src="https://github.com/user-attachments/assets/2a5acd63-fd95-4193-86f7-efe2fb82e493" />
+<img width="889" height="748" alt="Screenshot 2025-11-08 132508" src="https://github.com/user-attachments/assets/46dfcbf5-39fd-47bf-9ee5-fe2c5f35962a" />
+<img width="532" height="242" alt="Screenshot 2025-11-08 132536" src="https://github.com/user-attachments/assets/fe9be2d1-9257-40e1-a964-abf56b44dd41" />
+
+3. To create the isolation response for the webpage, we need to drag a trigger and new Slack message onto the Tines storyboard.
+<img width="449" height="587" alt="Screenshot 2025-11-08 135510" src="https://github.com/user-attachments/assets/c382ac71-8fc8-448d-be18-f73c38a8ee8d" />
+
+4. Configure the "No" trigger to check for ```{}user_prompt_body.isolate``` set to false. In the Slack message, I set this:
+<img width="382" height="125" alt="Screenshot 2025-11-08 135531" src="https://github.com/user-attachments/assets/8a616771-4aaf-42cb-862a-2a33beffbeef" />
+
 
 - - - 
 
