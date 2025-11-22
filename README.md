@@ -170,15 +170,61 @@ Tines allows teams to easily build, automate, and orchestrate security processes
 - - - 
 
 ## 6️⃣ Setup Slack in Tines
-In SOAR workflows, Slack is often used as a fast, centralized communication channel for security analysts to recieve alerts, collaborate, and trigger automated actions without leaving the chat environment. Let's set it up for our detection workflow!
+In SOAR workflows, Slack is often used as a fast, centralized communication channel for security analysts to receive alerts, collaborate, and trigger automated actions without leaving the chat environment. Let's set it up for our detection workflow!
 1. To start, create a [Slack](https://slack.com) account.
 
 2. In Slack, create a new workspace and an "alerts" channel. We will setup Tines to utilize this channel for security alerts.
 <img width="423" height="586" alt="image" src="https://github.com/user-attachments/assets/34c3f68b-0aed-42c6-b369-3e4e2e5a82a6" />
 
+3. Then install the Tines app on slack by pressing the "More" button and navigating to and installing the Tines app.
+   - On Tines, add a new credential for Slack
+
+4. On the Tine's storypage, add a Slack template. To sync the template with the alerts channel on Slack, copy the channel's channel ID from there and paste it into the Tine's template.
+   
+5. Now that the link is setup, we need to format messages for incoming security incidents including all necessary details. This ensures that security analysts can respond quickly. For my example, I used this HTML formatting:
+
+<img width="1663" height="373" alt="Screenshot 2025-11-08 132129" src="https://github.com/user-attachments/assets/9312766b-feb4-49d7-a580-308f59a883fc" />
+```
+Title: <<retrieve_detections.body.cat>>
+Time: <<retrieve_detections.body.detect.routing.event_time>>
+Computer: <<retrieve_detections.body.detect.routing.hostname>>
+Source IP: <<retrieve_detections.body.detect.routing.int_ip>>
+Username: <<retrieve_detections.body.detect.event.PARENT.USER_NAME>>
+File Path: <<retrieve_detections.body.detect.event.FILE_PATH>>
+Command Line: <<retrieve_detections.body.detect.event.COMMAND_LINE>>
+Sensor ID: <<retrieve_detections.body.detect.routing.sid>>
+Detection Link: <<retrieve_detections.body.link>>
+```
+
+After inputting my message and attaching the webhook to Slack, it achieves this output in the alerts channel we setup earlier:
+
+<img width="210" height="330" alt="image" src="https://github.com/user-attachments/assets/adafde8a-3379-4af2-b7cc-754a06cc79f0" />
+
+<img width="1952" height="1117" alt="Screenshot 2025-11-08 131806" src="https://github.com/user-attachments/assets/d909afe4-fb1e-4de7-ba49-5a1b6a7083b8" />
+
 - - - 
 
 ## 7️⃣ Add Emails to Tines Workflow
+Email notifications in a SOAR workflow is essential to keep the right people informed at the right time without requiring them to constantly monitor dashboards or tools.
+
+1. To add email notifications to our Tines SOAR, drag the **"send email"** icon to the storyboard and **connect it to the webhook**.
+   
+2. Configure email addresses, sender names, subjects, and the email body using the same formatting from earlier.
+   - In part 8, I setup a webpage that offers to optionally isolate a machine. I also included the link to that in the email so analysts can isolate from anywhere.
+   
+```
+Title: <<retrieve_detections.body.cat>>
+<br> Time: <<retrieve_detections.body.detect.routing.event_time>>
+<br> Computer: <<retrieve_detections.body.detect.routing.hostname>>
+<br> Source IP: <<retrieve_detections.body.detect.routing.int_ip>>
+<br> Username: <<retrieve_detections.body.detect.event.PARENT.USER_NAME>>
+<br> File Path: <<retrieve_detections.body.detect.event.FILE_PATH>>
+<br> Command Line: <<retrieve_detections.body.detect.event.COMMAND_LINE>>
+<br> Sensor ID: <<retrieve_detections.body.detect.routing.sid>>
+<br>
+<br> Detection Link: <<retrieve_detections.body.link>>
+```
+<img width="1667" height="508" alt="Screenshot 2025-11-08 132220" src="https://github.com/user-attachments/assets/fa3fff35-b971-4a5d-bda1-c2ddd9a84a33" />
 
 - - - 
 
