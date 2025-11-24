@@ -231,9 +231,11 @@ Title: <<retrieve_detections.body.cat>>
 ## 8️⃣ Setup Isolation Response webpage in Tines
 The last section for this project is to create a webpage that offers analysts the option to isolate compromised machines.
 
-1. In Tines storyboard, drag a "user prompt" into the storyboard to serve as the webpage and link it to the webhook.
-   
-2. To configure the webpage, title the webpage, provide a description, and use a boolean for the input field so an analyst can state yes or no to isolate a machine.
+1. In the Tines storyboard, drag a "user prompt" and link it to the webhook. This will server as our webpage to prompt whether or not to isolate a machine.
+
+   <img width="342" height="472" alt="image" src="https://github.com/user-attachments/assets/13404288-dfb6-4d03-8ce0-d4ca620d37ec" />
+
+3. To configure the webpage, title the webpage, provide a description, and use a boolean for the input field so an analyst can state yes or no to isolate a machine.
    - If you want to include important details like we did with the Slack alert, just copy and paste the same format into the description section of the webpage.
    
 <img width="496" height="178" alt="image" src="https://github.com/user-attachments/assets/2a5acd63-fd95-4193-86f7-efe2fb82e493" />
