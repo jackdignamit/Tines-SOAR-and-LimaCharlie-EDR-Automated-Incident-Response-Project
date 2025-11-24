@@ -205,7 +205,7 @@ After inputting my message and attaching the webhook to Slack, it achieves this 
 - - - 
 
 ## 7️⃣ Add Emails to Tines Workflow
-Email notifications in a SOAR workflow is essential to keep the right people informed at the right time without requiring them to constantly monitor dashboards or tools.
+Email notifications in a SOAR workflow are essential to keep the right people informed at the right time without requiring them to constantly monitor dashboards or tools.
 
 1. To add email notifications to our Tines SOAR, drag the **"send email"** icon to the storyboard and **connect it to the webhook**.
    
@@ -229,12 +229,12 @@ Title: <<retrieve_detections.body.cat>>
 - - - 
 
 ## 8️⃣ Setup Isolation Response webpage in Tines
-The last section for this project is to create a webpage that offers to isolate the compromised machine.
+The last section for this project is to create a webpage that offers analysts the option to isolate compromised machines.
 
-1. In Tines storyboard, drag a "user prompt" to the storyboard and link it to the webhook.
+1. In Tines storyboard, drag a "user prompt" into the storyboard to serve as the webpage and link it to the webhook.
    
-2. To create the prompt, title the webpage, a description, and use a boolean for the input field so an analyst can state yes or no to isolate a machine.
-   - If you want to include critical details like we did with the Slack alert, just copy and paste the same format into the description section of the webpage.
+2. To configure the webpage, title the webpage, provide a description, and use a boolean for the input field so an analyst can state yes or no to isolate a machine.
+   - If you want to include important details like we did with the Slack alert, just copy and paste the same format into the description section of the webpage.
    
 <img width="496" height="178" alt="image" src="https://github.com/user-attachments/assets/2a5acd63-fd95-4193-86f7-efe2fb82e493" />
 <img width="889" height="748" alt="Screenshot 2025-11-08 132508" src="https://github.com/user-attachments/assets/46dfcbf5-39fd-47bf-9ee5-fe2c5f35962a" />
@@ -243,9 +243,51 @@ The last section for this project is to create a webpage that offers to isolate 
 3. To create the isolation response for the webpage, we need to drag a trigger and new Slack message onto the Tines storyboard.
 <img width="449" height="587" alt="Screenshot 2025-11-08 135510" src="https://github.com/user-attachments/assets/c382ac71-8fc8-448d-be18-f73c38a8ee8d" />
 
-4. Configure the "No" trigger to check for ```{}user_prompt_body.isolate``` set to false. In the Slack message, I set this:
+4. Configure the "No" trigger to check for ```{}user_prompt_body.isolate``` set to false. When the computer is set to not be isolated, it generates a message in the alerts channel in Slack:
 <img width="382" height="125" alt="Screenshot 2025-11-08 135531" src="https://github.com/user-attachments/assets/8a616771-4aaf-42cb-862a-2a33beffbeef" />
 
+5. To configure the "yes" isolation response, copy and paste the previous trigger and change the value for ```{}user_prompt_body.isolate``` to be set to true. Then, attach a LimaCharlie template that does an isolate sensor response.
+<img width="831" height="402" alt="Screenshot 2025-11-08 140951" src="https://github.com/user-attachments/assets/a81d24b2-7933-40e7-a95e-57d7c45c81b7" />
+
+**Before setting up the LimaCharlie sensor, you will need to connect it using a new credential for the app and sync it to LimaCharlie.**
+   
+6. To sync a credential go to Access Management on the LimaCharlie dashboard, click **"REST API"** and then copy the **"Org JWT"** credential.  
+   Now, on Tines, navigate to "Your Teams" and paste it under a new text credential. For the domains field, set it to ```*limacharlie.io```.
+      - Setting the domain field with an asterisk* makes the credential only work for that particular domain and its subdomains
+   
+7. We want the sensor to use the routing sensor ID to determine which machine to isolate. In the LimaCharlie Isolate sensor, set the URL to: ```https://api.limacharlie.io/v1/{}retrieve_detections.body.routing.sid/isolation```.
+
+- - -
+
+To test our network isolation, we just need to generate an event by flagging our LaZage.exe detect and response rules.
+
+### VM PRE-ISOLATION:
+
+<img width="727" height="268" alt="Screenshot 2025-11-08 142048" src="https://github.com/user-attachments/assets/57df01f6-d671-4bc0-a05b-18a72648bb56" />
+<img width="525" height="902" alt="Screenshot 2025-11-08 140906" src="https://github.com/user-attachments/assets/f9a9e80d-fea8-4b7f-8e6c-92ccf3b90c09" />
+
+### ISOLATION EVENT IS TRIGGERED:
+
+<img width="698" height="452" alt="Screenshot 2025-11-08 141855" src="https://github.com/user-attachments/assets/4d2a8427-a1cc-4305-addd-010261de0b07" />
+
+### VM POST-ISOLATION:
+
+<img width="376" height="557" alt="Screenshot 2025-11-08 141927" src="https://github.com/user-attachments/assets/d2dfd95e-aaf0-49f3-bfa9-5d440ec57019" />
+<img width="754" height="235" alt="Screenshot 2025-11-08 142006" src="https://github.com/user-attachments/assets/0a7e5812-1141-4218-9b9f-c7406137c16c" />
+<img width="760" height="241" alt="Screenshot 2025-11-08 143021" src="https://github.com/user-attachments/assets/abfc625a-08cc-4aab-a138-60c4eec0db20" />
+
+**Our isolation works! It cuts off access to the internet and its network!**
+
+- - -
+
+8. If we want to configure a Slack message in the alerts channel for successful isolations, we simply just need to add a **LimaCharlie template** like before but set it to to **"get an isolation status"** and **attach it to the isolate sensor**.
+      - *Make sure it has the proper credentials (same one as before)*
+<img width="227" height="287" alt="image" src="https://github.com/user-attachments/assets/dd617be9-b41e-459a-92ca-5da78ed927e3" />
+
+10. Now, just copy and paste the Slack message from the "No" trigger and set the isolation status to **true**. Attach it to the "get isolation status" LimaCharlie template.
+<img width="1348" height="435" alt="Screenshot 2025-11-08 142941" src="https://github.com/user-attachments/assets/667c1c42-3a32-4c6c-8af9-88e8d2d69051" />
+<img width="990" height="1063" alt="Screenshot 2025-11-08 143039" src="https://github.com/user-attachments/assets/d6cabe11-5e09-4ad2-b611-3cf7fe6811ac" />
+<img width="2097" height="1200" alt="Screenshot 2025-11-08 143527" src="https://github.com/user-attachments/assets/e8981132-0889-4f10-89a1-3832c5c40e47" />
 
 - - - 
 
