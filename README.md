@@ -1,7 +1,7 @@
 # (WIP) Tines SOAR + LimaCharlie EDR Automated Incident Response Project
 *Completed: November 8, 2025*
 
-**This project showcases the design, configuration, and automation of **Tine's** SOAR workflow integrated with an EDR platform called **LimaCharlie**. The goal was to build an end‑to‑end incident response pipeline that detects suspicious activity, performs automated triage, enriches event data, and initiates coordinated response actions.**
+**This project showcases the design, configuration, and automation of a **Tine's** SOAR workflow integrated with an EDR platform called **LimaCharlie**. The goal was to build an end‑to‑end incident response pipeline that detects suspicious activity, performs automated triage, provides event data, and initiates coordinated response actions.**
 
 Tutorial by [MyDFIR](https://www.youtube.com/@MyDFIR).  
 All implementation, exploration, and documentation performed independently as part of my cybersecurity learning journey.
@@ -9,9 +9,9 @@ All implementation, exploration, and documentation performed independently as pa
 - - - 
 
 # Project Overview
-This is a hands-on lab environment which utilizes **Tines** as a *security orchestration, automation, and response (SOAR)* plaform with **LimaCharlie** as an *endpoint detection & response (EDR)* tool to simulate and automate incident response.
-A malicious program (LaZagne.exe) runs on a hosted virtual machine, which will flag **LimaCharlie** to detect it and send it to our SOAR. 
-Then, our **SOAR (Tines)** triggers automated actions such as alerting Slack channels, sending emails containing analytics, and a website to optionally isolate the infected machine from the network.
+This is a hands-on lab environment which utilizes **Tines** as a **security orchestration, automation, and response** *(SOAR)* plaform with **LimaCharlie** as an **endpoint detection & response** *(EDR)* tool to simulate and automate incident response.
+A malicious program *(LaZagne)* runs on a hosted virtual machine, which will flag **LimaCharlie** to detect it and send it to our SOAR. 
+Then, our SOAR triggers automated actions such as alerting Slack channels, sending emails containing analytics, and a website to optionally isolate the infected machine from the network.
 
 <img width="990" height="1063" alt="Screenshot 2025-11-08 143039" src="https://github.com/user-attachments/assets/2870de3a-b02e-40d6-841d-dc285ca35b26" />
 
@@ -31,8 +31,10 @@ Then, our **SOAR (Tines)** triggers automated actions such as alerting Slack cha
 
 # Architecture Diagram
 
+(diagram soon - WIP)
+
 1. **Detect malicious behavior:**  
-   Use LimaCharlie to detect when LaZagne.exe executes on a Windows VM by using a Detect & Response Rule. 
+   Use LimaCharlie to detect when LaZagne.exe executes on a Windows VM by using a Detect & Response (D&R) Rule. 
 2. **Automate response:**  
    Once detected, send alert data to a SOAR (Tines) to automate the next steps.  
 3. **Notify stakeholders**  
@@ -64,7 +66,7 @@ For my lab, I used a **Vultr VM** named ```mydfir-soar-edr``` with the following
 3. **Copy your installation key**. On the VM, open PowerShell as an administrator and execute the download (```./lc_sensor.exe```) with ***```-i [INSTALLATION KEY]```***. It should state the agent was installed successfully.
    
 4. If you view your services on the VM, you can verify that LimaCharlie was installed properly.
-<img width="654" height="85" alt="Screenshot 2025-11-08 115451" src="https://github.com/user-attachments/assets/c7a03cbc-3dd5-437b-a42c-cf7813dbc743" />
+<img width="654" height="85" alt="Screenshot 2025-11-08 115451" src="https://github.com/user-attachments/assets/c7a03cbc-3dd5-437b-a42c-cf7813dbc743" />  
 
   
 5. On the LimaCharlie dashboard, you can see that your virtual machine is now a sensor. If you click on its name you can view its isolation status, IP address, sensor ID, installer ID, and more.
@@ -77,30 +79,32 @@ For my lab, I used a **Vultr VM** named ```mydfir-soar-edr``` with the following
 ## 3️⃣ Install 'The LaZagne Project' from AlessandroZ's GitHub
 LaZagne is an open-source application that is used to retrieve passwords stored on a local computer.  
 It is a form of malware, but since we are using a VM with nothing personable on it, it will just be used to flag our detection rule on LimaCharlie.
-- **Review Source Code / Download here: [https://github.com/AlessandroZ/LaZagne](https://github.com/AlessandroZ/LaZagne)**
+**Review Source Code / Download here: [https://github.com/AlessandroZ/LaZagne](https://github.com/AlessandroZ/LaZagne)**
   
-1. If you attempt to install LaZagne, it will be blocked by Windows Security. **Disable Windows Security** by turning off **real-time protection** under **Virus & Threat Protection** settings on YOUR VM.
+1. If you attempt to install LaZagne, it will be blocked by Windows Security. **Disable Windows Security** by turning off **real-time protection** under **Virus & Threat Protection** settings on ***THE VIRTUAL MACHINE***.
    
 2. Install LaZagne from the link listed above. If prompted to keep the file, select "keep anyway".
-- *If it still fails to download, you can add exclusions for the Downloads folder or your entire drive if need be on Windows Defender.*
+   - *If it still fails to download, you can add exclusions for the Downloads folder or your entire drive if need be on Windows Defender.*
    
 3. In the downloads folder, shift and right click to open an administrator PowerShell window in your directory.
    
 4. Execute ```.\LaZagne.exe``` so LimaCharlie can detect it:
 <img width="1508" height="831" alt="Screenshot 2025-11-08 120656" src="https://github.com/user-attachments/assets/3151fc58-9c17-4462-9e43-035e9a27438e" />
 
-5. You can view LimaCharlie detections under the Timeline tab:
+5. You can view the LaZagne detection on LimaCharlie under the timeline tab:
 <img width="2065" height="350" alt="Screenshot 2025-11-08 120921" src="https://github.com/user-attachments/assets/352aae3d-25d0-4382-b8c7-7c48f71e24be" />
 
 - - - 
 
-## 4️⃣ Create Detection & Response Rule for LaZagne.exe
+## 4️⃣ Create a Detection & Response (D&R) Rule for LaZagne.exe
 In LimaCharlie, we want to create a **detection and response rule** to **automate the process of identifying threats and taking immediate action to mitigate them**. This rule will also be utilized for our webhooks in our Tine's SOAR later on.
 
 1. To create a D&R rule, open the main dashboard for LimaCharlie and select the **automation tab**. Then click **D&R rules**.
 
 2. Click on the "new rule" button in the top right corner. Under your new rule, you can either create your own LaZagne detection rule from scratch or utilize a template of a previously existing rule and adjust the values.
-But for convenience, I will list my rule for copy and pasting:
+This was my detection and response rule:
+
+      NOTE: *You can press "test event" at the bottom of the page to test if the rule is functioning properly.*
 
 <img width="691" height="769" alt="Screenshot 2025-11-08 123127" src="https://github.com/user-attachments/assets/7629a606-f5e6-4f37-b9af-452a3747e203" />
 
@@ -141,9 +145,7 @@ rules:
     - attack.credential_access
   name: JD - HackTool - Lazagne
 ```
-You can press "test event" at the bottom of the page to see if the D&R rule is functioning properly.
-
-### **A quick summary of what this rule does:**  
+### **What does this D&R rule do?**  
 This rule detects LaZagne and identifies its process name, command-line arguments, binary hash, LaZagne keywords (such as all), catches existing and new processes, and limits to only Windows events. It is not case sensitive and will detect anything containing the characters 'lazagne.exe' regardless of capitalization.
 
 <img width="2452" height="517" alt="Screenshot 2025-11-08 123509" src="https://github.com/user-attachments/assets/eb8fa090-1795-41c2-91ea-921dcf842708" />
@@ -172,11 +174,11 @@ Tines allows teams to easily build, automate, and orchestrate security processes
 In SOAR workflows, Slack is often used as a fast, centralized communication channel for security analysts to receive alerts, collaborate, and trigger automated actions without leaving the chat environment. Let's set it up for our detection workflow!
 1. To start, create a [Slack](https://slack.com) account.
 
-2. In Slack, create a new workspace and an "alerts" channel. We will setup Tines to utilize this channel for security alerts.
+2. In Slack, create a new workspace and an **"alerts"** channel. We will setup Tines to utilize this channel for security alerts.
 <img width="423" height="586" alt="image" src="https://github.com/user-attachments/assets/34c3f68b-0aed-42c6-b369-3e4e2e5a82a6" />
 
-3. Then install the Tines app on slack by pressing the "More" button and navigating to and installing the Tines app.
-   - On Tines, add a new credential for Slack
+3. Then **install the Tines app on Slack** by pressing the **"More"** button and navigating to and installing the Tines app.
+   - On Tines, add a new credential for Slack.
 
 4. On the Tine's storypage, add a Slack template. To sync the template with the alerts channel on Slack, copy the channel's channel ID from there and paste it into the Tine's template.
    
@@ -196,15 +198,15 @@ Sensor ID: <<retrieve_detections.body.detect.routing.sid>>
 Detection Link: <<retrieve_detections.body.link>>
 ```
 
-After inputting my message and attaching the webhook to Slack, it achieves this output in the alerts channel we setup earlier:
-
-<img width="210" height="330" alt="image" src="https://github.com/user-attachments/assets/adafde8a-3379-4af2-b7cc-754a06cc79f0" />
+6. After inserting the formatting, connect the webhook to Slack. Your Slack message in the alerts channel should look something like this:
 
 <img width="1952" height="1117" alt="Screenshot 2025-11-08 131806" src="https://github.com/user-attachments/assets/d909afe4-fb1e-4de7-ba49-5a1b6a7083b8" />
 
+<img width="210" height="330" alt="image" src="https://github.com/user-attachments/assets/adafde8a-3379-4af2-b7cc-754a06cc79f0" />
+
 - - - 
 
-## 7️⃣ Add Emails to Tines Workflow
+## 7️⃣ Add Emails to the Tines Workflow
 Email notifications in a SOAR workflow are essential to keep the right people informed at the right time without requiring them to constantly monitor dashboards or tools.
 
 1. To add email notifications to our Tines SOAR, drag the **"send email"** icon to the storyboard and **connect it to the webhook**.
@@ -231,7 +233,7 @@ Title: <<retrieve_detections.body.cat>>
 ## 8️⃣ Setup Isolation Response webpage in Tines
 The last section for this project is to create a webpage that offers analysts the option to isolate compromised machines.
 
-1. In the Tines storyboard, drag a "user prompt" and link it to the webhook. This will server as our webpage to prompt whether or not to isolate a machine.
+1. In the Tines storyboard, drag a "user prompt" and link it to the webhook.
 
    <img width="342" height="472" alt="image" src="https://github.com/user-attachments/assets/13404288-dfb6-4d03-8ce0-d4ca620d37ec" />
 
@@ -245,17 +247,17 @@ The last section for this project is to create a webpage that offers analysts th
 3. To create the isolation response for the webpage, we need to drag a trigger and new Slack message onto the Tines storyboard.
 <img width="449" height="587" alt="Screenshot 2025-11-08 135510" src="https://github.com/user-attachments/assets/c382ac71-8fc8-448d-be18-f73c38a8ee8d" />
 
-4. Configure the "No" trigger to check for ```{}user_prompt_body.isolate``` set to false. When the computer is set to not be isolated, it generates a message in the alerts channel in Slack:
+4. Configure the "No" trigger to check that ```{}user_prompt_body.isolate``` is set to false. Then, write a Slack message stating that the machine was not isolated:
 <img width="382" height="125" alt="Screenshot 2025-11-08 135531" src="https://github.com/user-attachments/assets/8a616771-4aaf-42cb-862a-2a33beffbeef" />
 
-5. To configure the "yes" isolation response, copy and paste the previous trigger and change the value for ```{}user_prompt_body.isolate``` to be set to true. Then, attach a LimaCharlie template that does an isolate sensor response.
+5. To configure the "yes" isolation response, copy and paste the previous trigger and change the value check for ```{}user_prompt_body.isolate``` to be set to true. Then, attach a LimaCharlie template that does an isolate sensor response.
 <img width="831" height="402" alt="Screenshot 2025-11-08 140951" src="https://github.com/user-attachments/assets/a81d24b2-7933-40e7-a95e-57d7c45c81b7" />
 
 **Before setting up the LimaCharlie sensor, you will need to connect it using a new credential for the app and sync it to LimaCharlie.**
    
-6. To sync a credential go to Access Management on the LimaCharlie dashboard, click **"REST API"** and then copy the **"Org JWT"** credential.  
-   Now, on Tines, navigate to "Your Teams" and paste it under a new text credential. For the domains field, set it to ```*limacharlie.io```.
-      - Setting the domain field with an asterisk* makes the credential only work for that particular domain and its subdomains
+6. To sync a credential go to "Access Management" on the LimaCharlie dashboard, click **REST API** and then copy the **Org JWT** credential.  
+   Onn Tines, navigate to "Your Teams" and paste it under a new text credential. For the credential's domains field, set it to ```*limacharlie.io```.
+      - Setting the domain field with an asterisk makes the credential only work for that particular domain and its subdomains
    
 7. We want the sensor to use the routing sensor ID to determine which machine to isolate. In the LimaCharlie Isolate sensor, set the URL to: ```https://api.limacharlie.io/v1/{}retrieve_detections.body.routing.sid/isolation```.
 
@@ -282,11 +284,11 @@ To test our network isolation, we just need to generate an event by flagging our
 
 - - -
 
-8. If we want to configure a Slack message in the alerts channel for successful isolations, we simply just need to add a **LimaCharlie template** like before but set it to to **"get an isolation status"** and **attach it to the isolate sensor**.
+8. If we want to configure a Slack message in the alerts channel for successful isolations, we simply just need to add a **LimaCharlie template** like before but set it to to **Get an Isolation Status** and attach it to the isolate sensor.
       - *Make sure it has the proper credentials (same one as before)*
 <img width="227" height="287" alt="image" src="https://github.com/user-attachments/assets/dd617be9-b41e-459a-92ca-5da78ed927e3" />
 
-10. Now, just copy and paste the Slack message from the "No" trigger and set the isolation status to **true**. Attach it to the "get isolation status" LimaCharlie template.
+10. Now, just copy and paste the Slack message from the "No" trigger and set the isolation status to **true**. Attach it to the **Get Isolation Status** LimaCharlie template.
 <img width="1348" height="435" alt="Screenshot 2025-11-08 142941" src="https://github.com/user-attachments/assets/667c1c42-3a32-4c6c-8af9-88e8d2d69051" />
 <img width="990" height="1063" alt="Screenshot 2025-11-08 143039" src="https://github.com/user-attachments/assets/d6cabe11-5e09-4ad2-b611-3cf7fe6811ac" />
 <img width="2097" height="1200" alt="Screenshot 2025-11-08 143527" src="https://github.com/user-attachments/assets/e8981132-0889-4f10-89a1-3832c5c40e47" />
@@ -294,10 +296,36 @@ To test our network isolation, we just need to generate an event by flagging our
 - - - 
 
 # Key Skills Demonstrated
+1. SOAR Design & Implementation
+     - Integrated APIs and remote actions
+        - Called LimaCharlie API from Tines to isolate a sensor when instructed
+     - Built a Tine's user-prompt page that asks an analyst via a yes/no input whether to isolate a compromised machine
+2. EDR Configuration
+      - Installed and configured LimaCharlie sensor on a Windows VM hosted on Vultr
+      - Wrote a Detect & Response (D&R) rule in LimaCharlie to catch malicious process executions (LaZagne.exe)
+3. Threat Simulation
+      - Using LaZagne to simulate malicious behavior on a virtual machine
+      - Tested detection repeatedly by triggering malicious activity in a controlled environment
+4. Alerting & Notification Workflow
+      - Inegrated Tines with Slack to send alerts to a dedicated alerts channel
+      - Configured email notifications from Tines for informing Stakeholders or response teams
+      - Formatted alerts with timestamps, hosts, sensor ID, etc) to give context for a detected incident
+5. Cloud / Virtualization Skills
+      - Hosted a cloud VM (Vultr) as a Windows endpoint
+      - Managed installation keys in LimaCharlie to implement sensors
+8. Technical documentation, reproducability, and Cybersecurity analytical thinking
 
 - - - 
 
 # Conclusion
-This project demonstrates how to utilize LimaCharlie as an EDR platform in conjunction with Tine's flexible playbooks to detect malware and automate notifications to security teams. This automated workflow reduces the response time, minimzes human error, and strengthens the overall security posture. Beyond the technical proof-of-concept, this lab demonstrates the real-world value of utilizing SOARs and EDR platforms. They free analysts from repetitive tasks so they can focus on more important tasks.
+This project successfully demonstrates how to build a robust, end-to-end incident response workflow using LimaCharlie (EDR) and Tines (SOAR). 
+It showcases how to simulate a real-world threat using LaZagne on a virtual machine, detecting its presence, and funneling essential security details into an automated workflow. 
+Upon detection, stakeholders are informed via Slack and email, and prompted analysts to make decisions to isolate compromised machines using a web interface. 
+
+This system reduces response time drastically, minimizes human error, and assists with security teams to handle incidents more efficiently.
+Its a proof-of-concept that highlights the importance of automation in modern security operations, letting analysts work on less repetitive tasks and focus on higher-impact investigations.
+Overall, this project showcases skills in detection, automation, integration, and cloud-based security architecture.
+
+**Thank you for reading and checking out my project!**
 
 
