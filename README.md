@@ -1,4 +1,4 @@
-# Tines SOAR + LimaCharlie EDR Automated Incident Response Project
+# Tines (SOAR) + LimaCharlie (EDR) Automated Incident Response Project
 *Completed: November 8, 2025*
 
 **This project showcases the design, configuration, and automation of a **Tine's** SOAR workflow integrated with an EDR platform called **LimaCharlie**. The goal was to build an end‑to‑end incident response pipeline that detects suspicious activity, performs automated triage, provides event data, and initiates coordinated response actions.**
