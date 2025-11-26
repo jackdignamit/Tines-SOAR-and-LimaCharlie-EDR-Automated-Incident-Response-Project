@@ -25,7 +25,6 @@ Then, our SOAR triggers automated actions such as alerting Slack channels, sendi
 | Slack             | Real-time alerting with dedicated channels | [https://slack.com](https://slack.com) |
 | LaZagne           | Open-source password retrieval tool used to simulate malicious activity | [https://github.com/AlessandroZ/LaZagne](https://github.com/AlessandroZ/LaZagne) |
 | Windows 10 VM        | Endpoint environment to run LaZagne and test EDR detection | [https://www.vultr.com/](https://www.vultr.com/) |
-| Draw.io           | Visualizing architecture and workflow diagrams | [https://www.draw.io](https://www.draw.io) |
 
 - - - 
 
