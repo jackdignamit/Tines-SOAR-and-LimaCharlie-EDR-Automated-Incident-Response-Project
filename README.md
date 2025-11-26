@@ -31,7 +31,7 @@ Then, our SOAR triggers automated actions such as alerting Slack channels, sendi
 
 # Architecture Diagram
 
-(diagram soon - WIP)
+<img width="1750" height="914" alt="architecture diagram" src="https://github.com/user-attachments/assets/3c2ca2b5-9f02-4eca-a161-20204f89ebed" />
 
 1. **Detect malicious behavior:**  
    Use LimaCharlie to detect when LaZagne.exe executes on a Windows VM by using a Detect & Response (D&R) Rule. 
