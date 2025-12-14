@@ -1,7 +1,7 @@
-# Tines (SOAR) + LimaCharlie (EDR) Automated Incident Response Project
+# Tines (SOAR) & LimaCharlie (EDR) Automated Incident Response Project
 *Completed: November 8, 2025*
 
-**This project showcases the design, configuration, and automation of a **Tine's** SOAR workflow integrated with an EDR platform called **LimaCharlie**. The goal was to build an end‑to‑end incident response pipeline that detects suspicious activity, performs automated triage, provides event data, and initiates coordinated response actions.**
+**This project showcases the design, configuration, and automation of a **Tines** SOAR workflow integrated with an EDR platform called **LimaCharlie**. The goal was to build an end‑to‑end incident response pipeline that detects suspicious activity, performs automated triage, provides event data, and initiates coordinated response actions.**
 
 Tutorial by [MyDFIR](https://www.youtube.com/@MyDFIR).  
 All implementation, exploration, and documentation performed independently as part of my cybersecurity learning journey.
@@ -9,9 +9,9 @@ All implementation, exploration, and documentation performed independently as pa
 - - - 
 
 # Project Overview
-This is a hands-on lab environment which utilizes **Tines** as a **security orchestration, automation, and response** *(SOAR)* plaform with **LimaCharlie** as an **endpoint detection & response** *(EDR)* tool to simulate and automate incident response.
-A malicious program *(LaZagne)* runs on a hosted virtual machine, which will flag **LimaCharlie** to detect it and send it to our SOAR. 
-Then, our SOAR triggers automated actions such as alerting Slack channels, sending emails containing analytics, and a website to optionally isolate the infected machine from the network.
+This is a hands-on lab environment which utilizes **Tines** as a **security orchestration, automation, and response** *(SOAR)* platform with **LimaCharlie** as an **endpoint detection & response** *(EDR)* tool to simulate and automate incident response.
+A malicious program *(LaZagne)* runs on a hosted virtual machine. **LimaCharlie** detects this activity and sends the event to our SOAR system.
+Then, our SOAR triggers automated actions, such as sending Slack alerts, emailing analytics, and presenting a website interface to optionally isolate the infected machine from the network.
 
 <img width="990" height="1063" alt="Screenshot 2025-11-08 143039" src="https://github.com/user-attachments/assets/2870de3a-b02e-40d6-841d-dc285ca35b26" />
 
@@ -41,7 +41,7 @@ Then, our SOAR triggers automated actions such as alerting Slack channels, sendi
 4. **Prompt a user using Times**  
    Prompt a user (such as an analyst) to decide whether to isolate the compromised host using a Time's webpage.
 5. **Isolate the endpoint**  
-If the decision is to isolate the host, LimaCharlie will be instructed to isolate the sensor to prevent further malicious activity. If not, it will remain as whitelisted on the network.
+If the decision is to isolate the host, LimaCharlie will be instructed to isolate the sensor to prevent further malicious activity. If not, it will remain whitelisted on the network.
 
 - - - 
 # 🔢 Step-by-Step Walkthrough 🔢
@@ -56,7 +56,7 @@ For my lab, I used a **Vultr VM** named ```mydfir-soar-edr``` with the following
 - - - 
 
 ## 2️⃣ Install LimaCharlie on Windows VM
-1. Login to LimaCharlie, make a new organization, and then **create an installation key** under the "Installation Keys" tab.
+1. Log in to LimaCharlie, make a new organization, and then **create an installation key** under the "Installation Keys" tab.
    - *Installation keys are unique codes using during sensor deployment to link a sensor to a specific organization and assign it optional tags*  
 <img width="2107" height="320" alt="Screenshot 2025-11-08 114045" src="https://github.com/user-attachments/assets/d81f89cf-f9e9-45a9-b604-ff139026b26a" />
   
@@ -77,7 +77,7 @@ For my lab, I used a **Vultr VM** named ```mydfir-soar-edr``` with the following
 
 ## 3️⃣ Install 'The LaZagne Project' from AlessandroZ's GitHub
 LaZagne is an open-source application that is used to retrieve passwords stored on a local computer.  
-It is a form of malware, but since we are using a VM with nothing personable on it, it will just be used to flag our detection rule on LimaCharlie.
+It is a form of malware, but since we are using a VM with no personal or sensitive data on it, it will just be used to flag our detection rule on LimaCharlie.
 **Review Source Code / Download here: [https://github.com/AlessandroZ/LaZagne](https://github.com/AlessandroZ/LaZagne)**
   
 1. If you attempt to install LaZagne, it will be blocked by Windows Security. **Disable Windows Security** by turning off **real-time protection** under **Virus & Threat Protection** settings on ***THE VIRTUAL MACHINE***.
@@ -100,7 +100,7 @@ In LimaCharlie, we want to create a **detection and response rule** to **automat
 
 1. To create a D&R rule, open the main dashboard for LimaCharlie and select the **automation tab**. Then click **D&R rules**.
 
-2. Click on the "new rule" button in the top right corner. Under your new rule, you can either create your own LaZagne detection rule from scratch or utilize a template of a previously existing rule and adjust the values.
+2. Click the "New Rule" button in the top right corner. You can create a LaZagne detection rule from scratch or modify an existing template.
 This was my detection and response rule:
 
       NOTE: *You can press "test event" at the bottom of the page to test if the rule is functioning properly.*
@@ -154,7 +154,7 @@ Now if you rerun LaZagne on your virtual machine, the LimaCharlie sensor will de
 - - - 
 
 ## 5️⃣ Establish a link between Tines and LimaCharlie
-Tines allows teams to easily build, automate, and orchestrate security processes without heavy coding. It utilizes event-driven "stories" to connect tools and websites to make enriched alerts and decisions using user-friendly interfaces.
+Tines enables teams to build and automate security processes without heavy coding. It utilizes event-driven "stories" to connect tools and websites to make enriched alerts and decisions using user-friendly interfaces.
 1. To start, create a [Tines](https://tines.com) account.
    
 2. In Tines, lets establish a link between Tines and LimaCharlie to funnel alerts into our workflow. Drag a webhook from the left-hand side to the center of the screen.
@@ -319,12 +319,10 @@ To test our network isolation, we just need to generate an event by flagging our
 # Conclusion
 This project successfully demonstrates how to build a robust, end-to-end incident response workflow using LimaCharlie (EDR) and Tines (SOAR). 
 It showcases how to simulate a real-world threat using LaZagne on a virtual machine, detecting its presence, and funneling essential security details into an automated workflow. 
-Upon detection, stakeholders are informed via Slack and email, and prompted analysts to make decisions to isolate compromised machines using a web interface. 
+Upon detection, stakeholders are informed via Slack and email, and prompts analysts to decide whether to isolate compromised machines using a web interface. 
 
-This system reduces response time drastically, minimizes human error, and assists with security teams to handle incidents more efficiently.
+This system reduces response time drastically, minimizes human error, and helps security teams handle incidents more efficiently.
 Its a proof-of-concept that highlights the importance of automation in modern security operations, letting analysts work on less repetitive tasks and focus on higher-impact investigations.
 Overall, this project showcases skills in detection, automation, integration, and cloud-based security architecture.
 
 **Thank you for reading and checking out my project!**
-
-
