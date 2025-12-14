@@ -3,8 +3,8 @@
 
 **This project showcases the design, configuration, and automation of a **Tines** SOAR workflow integrated with an EDR platform called **LimaCharlie**. The goal was to build an end‑to‑end incident response pipeline that detects suspicious activity, performs automated triage, provides event data, and initiates coordinated response actions.**
 
-Tutorial by [MyDFIR](https://www.youtube.com/@MyDFIR).  
-All implementation, exploration, and documentation performed independently as part of my cybersecurity learning journey.
+Based on a tutorial by [MyDFIR](https://www.youtube.com/@MyDFIR).  
+All implementation, exploration, and documentation conducted independently as part of my cybersecurity learning journey.
 
 - - - 
 
